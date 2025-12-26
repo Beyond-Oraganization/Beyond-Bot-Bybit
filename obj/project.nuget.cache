@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "dgSpecHash": "uH/g0SIGiKU=",
+  "success": true,
+  "projectFilePath": "D:\\Programming\\VS_Code_Progects\\BeyondBot_Bybit\\BeyondBot_Bybit.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Alderum\\.nuget\\packages\\bybit.net\\6.0.0\\bybit.net.6.0.0.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\cryptoexchange.net\\10.0.0\\cryptoexchange.net.10.0.0.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\libsodium\\1.0.20.1\\libsodium.1.0.20.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.configuration\\10.0.1\\microsoft.extensions.configuration.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\10.0.1\\microsoft.extensions.configuration.abstractions.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.configuration.binder\\10.0.1\\microsoft.extensions.configuration.binder.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\10.0.1\\microsoft.extensions.dependencyinjection.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.1\\microsoft.extensions.dependencyinjection.abstractions.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.diagnostics\\10.0.1\\microsoft.extensions.diagnostics.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.diagnostics.abstractions\\10.0.1\\microsoft.extensions.diagnostics.abstractions.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.http\\10.0.1\\microsoft.extensions.http.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.logging\\10.0.1\\microsoft.extensions.logging.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.1\\microsoft.extensions.logging.abstractions.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.options\\10.0.1\\microsoft.extensions.options.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.options.configurationextensions\\10.0.1\\microsoft.extensions.options.configurationextensions.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\microsoft.extensions.primitives\\10.0.1\\microsoft.extensions.primitives.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\nsec.cryptography\\25.4.0\\nsec.cryptography.25.4.0.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\serilog\\4.3.0\\serilog.4.3.0.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\serilog.sinks.console\\6.1.1\\serilog.sinks.console.6.1.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\system.diagnostics.diagnosticsource\\10.0.1\\system.diagnostics.diagnosticsource.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\system.io.pipelines\\10.0.1\\system.io.pipelines.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\system.text.encodings.web\\10.0.1\\system.text.encodings.web.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\system.text.json\\10.0.1\\system.text.json.10.0.1.nupkg.sha512",
+    "C:\\Users\\Alderum\\.nuget\\packages\\system.threading.channels\\10.0.1\\system.threading.channels.10.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
