@@ -1,0 +1,86 @@
+// See https://aka.ms/new-console-template for more information
+using System.Threading;
+using Serilog;
+using Bybit.Net;
+using Bybit.Net.Clients;
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
+
+Log.Information("BeyondBot_Bybit started. Running 24/7...");
+
+async Task Main()
+{
+    // Initialize Bybit client with your API credentials (replace with actual keys)
+    var client = new BybitRestClient();
+    client.SetApiCredentials("your-api-key", "your-api-secret"); // Required for placing orders
+
+    bool orderPlaced = false; // Flag to place order only once for this example
+
+    while (true)
+    {
+        try
+        {
+            // Placeholder for bot logic
+            Log.Information($"Bot is running... {DateTime.Now}");
+
+            // Example: Place a limit buy order for XAUT/USDT at price 4000 (quantity 0.01, adjust as needed)
+            if (!orderPlaced)
+            {
+                var orderResult = await client.SpotApi.Trading.PlaceOrderAsync(
+                    symbol: "XAUTUSDT",
+                    side: Bybit.Net.Enums.OrderSide.Buy,
+                    type: Bybit.Net.Enums.OrderType.Limit,
+                    quantity: 0.01m, // Adjust quantity based on your balance
+                    price: 4000m
+                );
+
+                if (orderResult.Success)
+                {
+                    Log.Information($"Limit buy order placed successfully: {orderResult.Data.Id}");
+                    orderPlaced = true; // Prevent re-placing
+                }
+                else
+                {
+                    Log.Error($"Failed to place order: {orderResult.Error}");
+                }
+            }
+
+            // Sleep for a short interval to avoid high CPU usage
+            Thread.Sleep(1000); // 1 second, adjust as needed
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Error: {ex.Message}");
+            // Optionally, add logging or recovery logic
+        }
+    }
+}
+
+// Call the async Main
+await Main();
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
+
+Log.Information("BeyondBot_Bybit started. Running 24/7...");
+
+while (true)
+{
+    try
+    {
+        // Placeholder for bot logic
+        // Add your trading bot code here
+        Log.Information($"Bot is running... {DateTime.Now}");
+        //https://github.com/Beyond-Oraganization/Beyond-Bot-Bybit.git
+        // Sleep for a short interval to avoid high CPU usage
+        Thread.Sleep(1000); // 1 second, adjust as needed
+    }
+    catch (Exception ex)
+    {
+        Log.Error($"Error: {ex.Message}");
+        // Optionally, add logging or recovery logic
+    }
+}

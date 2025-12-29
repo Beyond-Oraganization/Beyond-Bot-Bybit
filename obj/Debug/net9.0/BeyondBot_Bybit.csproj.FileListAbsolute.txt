@@ -54,3 +54,4 @@ D:\Programming\VS_Code_Progects\BeyondBot_Bybit\bin\Debug\net9.0\runtimes\browse
 D:\Programming\VS_Code_Progects\BeyondBot_Bybit\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Text.Encodings.Web.dll
 D:\Programming\VS_Code_Progects\BeyondBot_Bybit\obj\Debug\net9.0\BeyondBot_Bybit.csproj.AssemblyReference.cache
 D:\Programming\VS_Code_Progects\BeyondBot_Bybit\obj\Debug\net9.0\BeyondBo.7765F9DD.Up2Date
+D:\Programming\VS_Code_Progects\BeyondBot_Bybit\obj\Debug\net9.0\BeyondBot_Bybit.sourcelink.json
