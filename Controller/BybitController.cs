@@ -86,7 +86,7 @@ namespace BeyondBot.Controller
             var result = await client.V5Api.ExchangeData.GetKlinesAsync(Category.Spot, symbol, klineInterval, limit: limit, startTime: startTime == default ? null : startTime, endTime: endTime == default ? null : endTime);
             if (!result.Success) throw new Exception("Failed to get klines: " + result.Error?.Message);
 
-            return result.Data.List.Select(k => new KLine(k.StartTime, k.StartTime.AddMinutes(1), k.OpenPrice, k.ClosePrice, k.HighPrice, k.LowPrice, k.Volume)).ToList();
+            return result.Data.List.Select(k => new KLine(k.StartTime, k.StartTime.AddSeconds((int)klineInterval), k.OpenPrice, k.ClosePrice, k.HighPrice, k.LowPrice, k.Volume)).ToList();
         }
 
         public Task<bool> StatusAsync()

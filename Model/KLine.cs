@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BeyondBot.Model
 {
-    class KLine
+    public class KLine
     {
         public DateTime OpenTime { get; set; }
         public DateTime CloseTime { get; set; }

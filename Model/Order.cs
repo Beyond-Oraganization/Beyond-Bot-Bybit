@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BeyondBot.Model
 {
-    class Order
+    public class Order
     {
         public string OrderId { get; set; }
         public string Symbol { get; set; }
@@ -39,7 +39,7 @@ namespace BeyondBot.Model
         }
     }
 
-    enum OrderType
+    public enum OrderType
     {
         Market,
         Limit,
@@ -47,7 +47,7 @@ namespace BeyondBot.Model
         TakeProfit
     }
 
-    enum OrderStatus
+    public enum OrderStatus
     {
         New,
         PartiallyFilled,
@@ -56,7 +56,7 @@ namespace BeyondBot.Model
         Rejected
     }
 
-    enum OrderSide
+    public enum OrderSide
     {
         Buy,
         Sell

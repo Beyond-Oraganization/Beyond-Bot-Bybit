@@ -84,3 +84,57 @@ while (true)
         // Optionally, add logging or recovery logic
     }
 }
+
+
+
+
+
+
+
+
+
+Summary of Adjustments
+I have made the following changes based on your request:
+
+Updated Database Schema: The Strategies table already uses StrategyData instead of Data to avoid SQL keyword conflicts.
+
+Created Strategy Model Class: Added Strategy.cs with properties for ID, KLineID, and StrategyData, including constructors and XML documentation comments.
+
+Enhanced MySQLController: Added comprehensive CRUD methods for Strategies (GetStrategies, InsertStrategy, UpdateStrategy, DeleteStrategy). Also added detailed XML documentation comments to all methods and the class for better code readability and IntelliSense support.
+
+The project builds successfully with these updates.
+
+*** Guide for Implementing Further Database Modifications ***
+To modify your database schema and keep your code in sync, follow these steps:
+
+1. Update the Database Schema
+Edit DatabaseSchema.sql to add, remove, or modify tables/columns.
+For example, to add a new column to Orders:
+Run the updated SQL script against your MySQL database using MySQL Workbench, command line, or your preferred tool.
+2. Update Model Classes
+If adding/removing columns, update the corresponding C# class in Model.
+Add new properties with appropriate data types (e.g., string for VARCHAR, decimal for DECIMAL).
+Ensure classes are public and properties have getters/setters.
+Update constructors as needed.
+3. Update MySQLController Methods
+Modify SELECT queries to include new columns.
+Update INSERT/UPDATE statements to handle new parameters.
+Use parameterized queries to prevent SQL injection.
+Add new CRUD methods for new tables if needed.
+4. Handle Data Type Mappings
+MySQL DATETIME → C# DateTime
+MySQL DECIMAL → C# decimal
+MySQL VARCHAR → C# string
+MySQL INT → C# int
+Enums: Store as VARCHAR in DB, parse with Enum.Parse<T>() in code.
+5. Best Practices
+Always use using statements for database connections to ensure proper disposal.
+Validate input data before database operations.
+Consider adding error handling (try-catch) for database exceptions.
+For large datasets, implement pagination or filtering in queries.
+Update connection string in MySQLController if credentials change.
+6. Testing
+After changes, build the project and test CRUD operations.
+Verify data integrity and relationships.
+Check for any breaking changes in existing code.
+This approach ensures your database and code remain synchronized as your project evolves. If you need help with specific modifications, provide details about the changes you want to make.
