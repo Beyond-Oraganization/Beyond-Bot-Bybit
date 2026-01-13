@@ -5,6 +5,7 @@ namespace BeyondBot.Model
 {
     public class KLine
     {
+        public int ID { get; set; } = 0;
         public DateTime OpenTime { get; set; }
         public DateTime CloseTime { get; set; }
         public decimal OpenPrice { get; set; }
@@ -15,6 +16,18 @@ namespace BeyondBot.Model
 
         public KLine(DateTime openTime, DateTime closeTime, decimal openPrice, decimal closePrice, decimal highPrice, decimal lowPrice, decimal volume)
         {
+            OpenTime = openTime;
+            CloseTime = closeTime;
+            OpenPrice = openPrice;
+            ClosePrice = closePrice;
+            HighPrice = highPrice;
+            LowPrice = lowPrice;
+            Volume = volume;
+        }
+
+        public KLine(int id, DateTime openTime, DateTime closeTime, decimal openPrice, decimal closePrice, decimal highPrice, decimal lowPrice, decimal volume)
+        {
+            ID = id;
             OpenTime = openTime;
             CloseTime = closeTime;
             OpenPrice = openPrice;

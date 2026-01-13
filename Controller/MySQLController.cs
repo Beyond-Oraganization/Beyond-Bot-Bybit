@@ -10,13 +10,16 @@ namespace BeyondBot.Controller
     /// Provides CRUD operations for KLines, Orders, Strategies, Symbols, and Timeframes.
     /// Uses MySQL Connector/NET for database connectivity.
     /// </summary>
-    public class MySQLController
+    public class MySQLController : IDBController
     {
         /// <summary>
         /// Connection string for the MySQL database.
         /// Update this with your actual database credentials and server details.
         /// </summary>
         private readonly string connectionString = "server=localhost;database=BeyondBotDB;uid=root;pwd=;";
+
+        public static MySQLController? instance;
+        public static MySQLController Instance => instance ??= new MySQLController();
 
         // Symbol CRUD Operations
 
@@ -268,12 +271,13 @@ namespace BeyondBot.Controller
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("SELECT OpenTime, CloseTime, OpenPrice, ClosePrice, HighPrice, LowPrice, Volume FROM KLines", conn);
+                var cmd = new MySqlCommand("SELECT ID, OpenTime, CloseTime, OpenPrice, ClosePrice, HighPrice, LowPrice, Volume FROM KLines", conn);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
                         var kline = new KLine(
+                            reader.GetInt32("ID"),
                             reader.GetDateTime("OpenTime"),
                             reader.GetDateTime("CloseTime"),
                             reader.GetDecimal("OpenPrice"),
@@ -289,7 +293,7 @@ namespace BeyondBot.Controller
             return list;
         }
 
-        public List<KLine> GetKlines(Symbol symbol, TimeframeInterval interval)
+        public List<KLine> GetKLines(Symbol symbol, TimeframeInterval interval)
         {
             var list = new List<KLine>();
             using (var conn = new MySqlConnection(connectionString))
@@ -323,7 +327,7 @@ namespace BeyondBot.Controller
             return list;
         }
 
-        public List<KLine> GetKlines(Symbol symbol, TimeframeInterval interval, DateTime startTime, DateTime endTime)
+        public List<KLine> GetKLines(Symbol symbol, TimeframeInterval interval, DateTime startTime, DateTime endTime)
         {
             var list = new List<KLine>();
             using (var conn = new MySqlConnection(connectionString))
@@ -385,15 +389,14 @@ namespace BeyondBot.Controller
         /// <summary>
         /// Updates an existing KLine in the database.
         /// </summary>
-        /// <param name="id">The ID of the KLine to update.</param>
         /// <param name="kline">The updated KLine object.</param>
-        public void UpdateKLine(int id, KLine kline)
+        public void UpdateKLine(KLine kline)
         {
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
                 var cmd = new MySqlCommand("UPDATE KLines SET OpenTime=@ot, CloseTime=@ct, OpenPrice=@op, ClosePrice=@cp, HighPrice=@hp, LowPrice=@lp, Volume=@v WHERE ID=@id", conn);
-                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@id", kline.ID);
                 cmd.Parameters.AddWithValue("@ot", kline.OpenTime);
                 cmd.Parameters.AddWithValue("@ct", kline.CloseTime);
                 cmd.Parameters.AddWithValue("@op", kline.OpenPrice);
@@ -408,14 +411,14 @@ namespace BeyondBot.Controller
         /// <summary>
         /// Deletes a KLine from the database by its ID.
         /// </summary>
-        /// <param name="id">The ID of the KLine to delete.</param>
-        public void DeleteKLine(int id)
+        /// <param name="kLine">The KLine object to delete.</param>
+        public void DeleteKLine(KLine kLine)
         {
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
                 var cmd = new MySqlCommand("DELETE FROM KLines WHERE ID=@id", conn);
-                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@id", kLine.ID);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -434,6 +437,35 @@ namespace BeyondBot.Controller
             {
                 conn.Open();
                 var cmd = new MySqlCommand("SELECT OrderId, Symbol, Quantity, Price, Status, Type, Side, CreatedAt FROM Orders", conn);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var order = new Order(
+                            reader.GetString("OrderId"),
+                            reader.GetString("Symbol"),
+                            reader.GetDecimal("Quantity"),
+                            reader.GetDecimal("Price"),
+                            Enum.Parse<OrderStatus>(reader.GetString("Status")),
+                            Enum.Parse<OrderType>(reader.GetString("Type")),
+                            Enum.Parse<OrderSide>(reader.GetString("Side")),
+                            reader.GetDateTime("CreatedAt")
+                        );
+                        list.Add(order);
+                    }
+                }
+            }
+            return list;
+        }
+
+        public List<Order> GetOrders(string symbol)
+        {
+            var list = new List<Order>();
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("SELECT OrderId, Symbol, Quantity, Price, Status, Type, Side, CreatedAt FROM Orders WHERE Symbol = @symbol", conn);
+                cmd.Parameters.AddWithValue("@symbol", symbol);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -521,19 +553,19 @@ namespace BeyondBot.Controller
         /// Retrieves all Strategies from the database.
         /// Note: This method fetches all records; consider adding filters for large datasets.
         /// </summary>
-        /// <returns>A list of all Strategy objects.</returns>
-        public List<Strategy> GetStrategies()
+        /// <returns>A list of all StrategyCache objects.</returns>
+        public List<StrategyCache> GetStrategies()
         {
-            var list = new List<Strategy>();
+            var list = new List<StrategyCache>();
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("SELECT ID, KLineID, StrategyData FROM Strategies", conn);
+                var cmd = new MySqlCommand("SELECT ID, KLineID, StrategyData FROM StrategyCaches", conn);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        var strategy = new Strategy(
+                        var strategy = new StrategyCache(
                             reader.GetInt32("ID"),
                             reader.GetInt32("KLineID"),
                             reader.GetString("StrategyData")
@@ -548,13 +580,13 @@ namespace BeyondBot.Controller
         /// <summary>
         /// Inserts a new Strategy into the database.
         /// </summary>
-        /// <param name="strategy">The Strategy object to insert (ID will be auto-generated).</param>
-        public void InsertStrategy(Strategy strategy)
+        /// <param name="strategy">The StrategyCache object to insert (ID will be auto-generated).</param>
+        public void InsertStrategy(StrategyCache strategy)
         {
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("INSERT INTO Strategies (KLineID, StrategyData) VALUES (@kid, @sd)", conn);
+                var cmd = new MySqlCommand("INSERT INTO StrategyCaches (KLineID, StrategyData) VALUES (@kid, @sd)", conn);
                 cmd.Parameters.AddWithValue("@kid", strategy.KLineID);
                 cmd.Parameters.AddWithValue("@sd", strategy.StrategyData);
                 cmd.ExecuteNonQuery();
@@ -565,13 +597,13 @@ namespace BeyondBot.Controller
         /// Updates an existing Strategy in the database.
         /// </summary>
         /// <param name="id">The ID of the Strategy to update.</param>
-        /// <param name="strategy">The updated Strategy object.</param>
-        public void UpdateStrategy(int id, Strategy strategy)
+        /// <param name="strategy">The updated StrategyCache object.</param>
+        public void UpdateStrategy(int id, StrategyCache strategy)
         {
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("UPDATE Strategies SET KLineID=@kid, StrategyData=@sd WHERE ID=@id", conn);
+                var cmd = new MySqlCommand("UPDATE StrategyCaches SET KLineID=@kid, StrategyData=@sd WHERE ID=@id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 cmd.Parameters.AddWithValue("@kid", strategy.KLineID);
                 cmd.Parameters.AddWithValue("@sd", strategy.StrategyData);
@@ -588,7 +620,7 @@ namespace BeyondBot.Controller
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("DELETE FROM Strategies WHERE ID=@id", conn);
+                var cmd = new MySqlCommand("DELETE FROM StrategyCaches WHERE ID=@id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 cmd.ExecuteNonQuery();
             }

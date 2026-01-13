@@ -3,10 +3,10 @@ using System;
 namespace BeyondBot.Model
 {
     /// <summary>
-    /// Represents a trading strategy associated with a specific KLine.
+    /// Represents a trading strategy cache associated with a specific KLine.
     /// This class stores strategy data as a string, allowing flexibility for different strategy types.
     /// </summary>
-    public class Strategy
+    public class StrategyCache
     {
         /// <summary>
         /// Unique identifier for the strategy record.
@@ -24,23 +24,23 @@ namespace BeyondBot.Model
         public string StrategyData { get; set; }
 
         /// <summary>
-        /// Constructor for creating a new strategy (without ID, as it's auto-generated).
+        /// Constructor for creating a new strategy cache (without ID, as it's auto-generated).
         /// </summary>
-        /// <param name="kLineID">The ID of the KLine this strategy is associated with.</param>
+        /// <param name="kLineID">The ID of the KLine this strategy cache is associated with.</param>
         /// <param name="strategyData">The strategy data as a string.</param>
-        public Strategy(int kLineID, string strategyData)
+        public StrategyCache(int kLineID, string strategyData)
         {
             KLineID = kLineID;
             StrategyData = strategyData;
         }
 
         /// <summary>
-        /// Constructor for loading an existing strategy from the database.
+        /// Constructor for loading an existing strategy cache from the database.
         /// </summary>
-        /// <param name="id">The unique ID of the strategy.</param>
+        /// <param name="id">The unique ID of the strategy cache.</param>
         /// <param name="kLineID">The ID of the associated KLine.</param>
         /// <param name="strategyData">The strategy data.</param>
-        public Strategy(int id, int kLineID, string strategyData)
+        public StrategyCache(int id, int kLineID, string strategyData)
         {
             ID = id;
             KLineID = kLineID;
