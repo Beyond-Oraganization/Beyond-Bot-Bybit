@@ -25,23 +25,23 @@ namespace BeyondBot.Model.Indicator
             High = high;
         }
 
-        public List<AdaptiveEnvelope> Calculate(List<KLine> klines, List<MovingAvarage> movingAvarages, int deviation = 1, int movingCount = 2)
+        public List<AdaptiveEnvelope> Calculate(List<KLine> klines, List<MovingAverage> movingAverages, int deviation = 1, int movingCount = 2)
         {
             List<AdaptiveEnvelope> envelopes = new List<AdaptiveEnvelope>();
             //It's nesecary because atrs are deviation variables
             //(Optimization) Можемо замінити цей метод на зроблений GetRMA()
             //бо нічого не зміниться
-            List<MovingAvarage> atrs = new ATR().Calculate(klines, movingAvarages[0].Depth);
+            List<MovingAverage> atrs = new ATR().Calculate(klines, movingAverages[0].Depth);
 
             AdaptiveEnvelope envelope;
             for (int a = 0; a < klines.Count; a++)
             {
                 envelope = new AdaptiveEnvelope();
-                envelope.Center = movingAvarages[a].Value;
+                envelope.Center = movingAverages[a].Value;
 
                 envelope.ID = klines[a].ID;
                 envelope.NumberOfLines = movingCount;
-                envelope.Depth = movingAvarages[a].Depth;
+                envelope.Depth = movingAverages[a].Depth;
                 envelope.DateTime = klines[a].OpenTime;
 
                 envelope.Low = new List<decimal>();

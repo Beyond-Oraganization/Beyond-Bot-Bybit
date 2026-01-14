@@ -1,17 +1,20 @@
 namespace BeyondBot.Model.Indicator
 {
-    class RMA : MovingAvarage
+    class RMA : MovingAverage
     {
         public RMA() : base()
         {
         }
-        public RMA(int id, string name, int depth, decimal value, DateTime dateTime) : base(id, name, depth, value, dateTime)
+        public RMA(int kLineId, string name, int depth, decimal value, DateTime dateTime) : base(kLineId, name, depth, value, dateTime)
+        {
+        }
+        public RMA(int id, int kLineId, string name, int depth, decimal value, DateTime dateTime) : base(id, kLineId, name, depth, value, dateTime)
         {
         }
 
-        public override List<MovingAvarage> Calculate(List<KLine> klines, int depth)
+        public override List<MovingAverage> Calculate(List<KLine> klines, int depth)
         {
-            List<MovingAvarage> rmas = new List<MovingAvarage>();
+            List<MovingAverage> rmas = new List<MovingAverage>();
             decimal weighting = 1 / depth;
 
             //First ema calculating
@@ -34,7 +37,7 @@ namespace BeyondBot.Model.Indicator
             return rmas;
         }
 
-        public override MovingAvarage Parse(string data)
+        public override MovingAverage Parse(string data)
         {
             var parts = data.Split(';');
             return new RMA(

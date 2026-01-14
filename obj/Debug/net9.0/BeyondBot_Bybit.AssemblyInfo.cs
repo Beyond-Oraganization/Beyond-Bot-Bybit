@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BeyondBot_Bybit")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a0ec37dee3b5d86d51689df214d6440a12fc2988")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1e9bdcf6444be75b251d8cd415d114d39c4e67b2")]
 [assembly: System.Reflection.AssemblyProductAttribute("BeyondBot_Bybit")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BeyondBot_Bybit")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,20 +1,24 @@
 
 namespace BeyondBot.Model.Indicator
 {
-    class ATR : MovingAvarage
+    class ATR : MovingAverage
     {
         public string Description => "Average True Range";
         public ATR() : base()
         {
         }
-        public ATR(int id, string name, int depth, decimal value, DateTime dateTime) : base(id, name, depth, value, dateTime)
+        public ATR(int kLineId, string name, int depth, decimal value, DateTime dateTime) : base(kLineId, name, depth, value, dateTime)
         {
         }
 
-        public override List<MovingAvarage> Calculate(List<KLine> klines, int depth)
+        public ATR(int id, int kLineId, string name, int depth, decimal value, DateTime dateTime) : base(id, kLineId, name, depth, value, dateTime)
+        {
+        }
+
+        public override List<MovingAverage> Calculate(List<KLine> klines, int depth)
         {
             //List that will be returned
-            List<MovingAvarage> atrs = new List<MovingAvarage>();
+            List<MovingAverage> atrs = new List<MovingAverage>();
 
             //True range is differance between high and low of kline
             List<decimal> trueRanges = new List<decimal>();
@@ -27,13 +31,13 @@ namespace BeyondBot.Model.Indicator
             var rmaTrueRanges = rma.Calculate(klines, depth).ConvertAll(tr => tr.Value);
 
             //ATR is basicaly RMA but indexed for every kline
-            MovingAvarage atr;
+            MovingAverage atr;
             for (int i = 0; i < klines.Count; i++)
             {
                 atr = new ATR();
                 atr.Value = rmaTrueRanges[i];
 
-                atr.ID = klines[i].ID;
+                atr.KLineID = klines[i].ID;
                 atr.DateTime = klines[i].OpenTime;
                 atr.Depth = (int)depth;
 
@@ -43,7 +47,7 @@ namespace BeyondBot.Model.Indicator
             return atrs;
         }
 
-        public override MovingAvarage Parse(string data)
+        public override MovingAverage Parse(string data)
         {
             var parts = data.Split(';');
             return new ATR(

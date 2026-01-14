@@ -1,26 +1,30 @@
 namespace BeyondBot.Model.Indicator
 {
-    class EMA : MovingAvarage
+    class EMA : MovingAverage
     {
         public EMA() : base()
         {
         }
-        public EMA(int id, string name, int depth, decimal value, DateTime dateTime) : base(id, name, depth, value, dateTime)
+        public EMA(int kLineId, string name, int depth, decimal value, DateTime dateTime) : base(kLineId, name, depth, value, dateTime)
         {
         }
 
-        public override List<MovingAvarage> Calculate(List<KLine> klines, int depth)
+        public EMA(int id, int kLineId, string name, int depth, decimal value, DateTime dateTime) : base(id, kLineId, name, depth, value, dateTime)
         {
-            List<MovingAvarage> emas = new List<MovingAvarage>();
+        }
+
+        public override List<MovingAverage> Calculate(List<KLine> klines, int depth)
+        {
+            List<MovingAverage> emas = new List<MovingAverage>();
             decimal weighting = 2 / (depth + 1);
 
             //First ema calculating
-            MovingAvarage ema = new EMA();
+            MovingAverage ema = new EMA();
             if (klines.Count != 0)
             {
                 ema.Value = klines[0].ClosePrice * weighting + klines[0].OpenPrice * (1 - weighting);
                 ema.DateTime = klines[0].OpenTime;
-                ema.ID = klines[0].ID;
+                ema.KLineID = klines[0].ID;
                 ema.Depth = (int)depth;
 
                 emas.Add(ema);
@@ -31,7 +35,7 @@ namespace BeyondBot.Model.Indicator
                     ema = new EMA();
                     ema.Value = klines[i].ClosePrice * weighting + emas[i - 1].Value * (1 - weighting);
                     ema.DateTime = klines[i].OpenTime;
-                    ema.ID = klines[i].ID;
+                    ema.KLineID = klines[i].ID;
                     ema.Depth = (int)depth;
                     ema.Name = "EMA";
                     emas.Add(ema);
@@ -41,7 +45,7 @@ namespace BeyondBot.Model.Indicator
             return emas;
         }
 
-        public override MovingAvarage Parse(string data)
+        public override MovingAverage Parse(string data)
         {
             var parts = data.Split(';');
             return new EMA(

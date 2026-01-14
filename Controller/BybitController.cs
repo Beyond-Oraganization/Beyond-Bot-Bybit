@@ -136,15 +136,26 @@ namespace BeyondBot.Controller
                 "1h" => KlineInterval.OneHour,
                 "4h" => KlineInterval.FourHours,
                 "1d" => KlineInterval.OneDay,
+                "1w" => KlineInterval.OneWeek,
+                "1M" => KlineInterval.OneMonth,
                 _ => KlineInterval.OneHour
             };
-
+            
             var result = await client.V5Api.ExchangeData.GetKlinesAsync(Category.Spot, symbol, klineInterval, limit: limit, startTime: startTime == default ? null : startTime, endTime: endTime == default ? null : endTime);
             if (!result.Success) throw new Exception("Failed to get klines: " + result.Error?.Message);
-
-            return result.Data.List.Select(k => new KLine(k.StartTime, k.StartTime.AddSeconds((int)klineInterval), k.OpenPrice, k.ClosePrice, k.HighPrice, k.LowPrice, k.Volume)).ToList();
+            
+            return result.Data.List.Select(k => new KLine(k.StartTime, k.StartTime.AddSeconds(Convert.ToInt32(klineInterval)), k.OpenPrice, k.ClosePrice, k.HighPrice, k.LowPrice, k.Volume)).ToList();
         }
-
+        public async Task<KLine> GetOldestKLineAsync(string symbol = "XAUTUSDT", string interval = "1M")
+        {
+            var klines = await GetMarketDataAsync(symbol, interval, 1000, startTime: new DateTime(2020,5,1), endTime: DateTime.Now);
+            foreach (var kline in klines)
+            {
+                Console.WriteLine($"KLine Open Time: {kline.OpenTime}, Close Time: {kline.CloseTime}");
+            }
+            if (klines.Count == 0) throw new Exception("No klines found for the specified time.");
+            return klines.OrderBy(k => k.OpenTime).First();
+        }
         public Task<bool> StatusAsync()
         {
             // Implementation for status check

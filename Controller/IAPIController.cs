@@ -11,5 +11,6 @@ namespace BeyondBot.Controller
         Task<Order> CloseOrderAsync(Order order);
         Task<List<Order>> GetOrdersAsync();
         Task<List<KLine>> GetMarketDataAsync(string symbol, string interval, int limit, DateTime startTime = default, DateTime endTime = default);
+        Task<KLine> GetOldestKLineAsync(string symbol, string interval);
     }
 }
