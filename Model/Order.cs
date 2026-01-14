@@ -44,7 +44,8 @@ namespace BeyondBot.Model
         Market,
         Limit,
         StopLoss,
-        TakeProfit
+        TakeProfit,
+        None
     }
 
     public enum OrderStatus
@@ -53,12 +54,14 @@ namespace BeyondBot.Model
         PartiallyFilled,
         Filled,
         Canceled,
-        Rejected
+        Rejected,
+        None
     }
 
     public enum OrderSide
     {
         Buy,
-        Sell
+        Sell,
+        None
     }
 }

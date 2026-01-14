@@ -24,5 +24,12 @@
         {
             return $"{ID};{Name};{Depth};{Value};{DateTime}";
         }
+
+        public IndicatorCache ConvertToCache(int klineID)
+        {
+            return new IndicatorCache(klineID, ToString());
+        }
+
+        public abstract MovingAvarage Parse(string data);
     }
 }

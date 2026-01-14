@@ -33,11 +33,24 @@ namespace BeyondBot.Model.Indicator
                     ema.DateTime = klines[i].OpenTime;
                     ema.ID = klines[i].ID;
                     ema.Depth = (int)depth;
+                    ema.Name = "EMA";
                     emas.Add(ema);
                 }
             }
 
             return emas;
+        }
+
+        public override MovingAvarage Parse(string data)
+        {
+            var parts = data.Split(';');
+            return new EMA(
+                int.Parse(parts[0]),
+                parts[1],
+                int.Parse(parts[2]),
+                decimal.Parse(parts[3]),
+                DateTime.Parse(parts[4])
+            );
         }
     }
 }

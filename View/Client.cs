@@ -23,6 +23,7 @@ namespace BeyondBot.View
                         Console.WriteLine("Available commands: help - shows all comands\n"
                             + "exit - stops program\n"
                             + "status - shows bot status\n"
+                            + "db status - shows database connection status\n"
                             + "restart - restarts the bot\n"
                             + "place order - places a new order\n"
                             + "cancel order - cancels an order\n"
@@ -40,7 +41,8 @@ namespace BeyondBot.View
                             + "update timeframe - updates an existing timeframe in database\n"
                             + "delete timeframe - deletes a timeframe from database\n"
                             + "show klines - shows all klines in database\n"
-                            + "show saved orders - shows all saved orders in database\n");
+                            + "show saved orders - shows all saved orders in database\n"
+                            + "delete all saved orders - deletes all saved orders from database\n");
                         break;
                     case "":
                         // Ignore empty input
@@ -49,21 +51,53 @@ namespace BeyondBot.View
                     #region Additional Commands
                     //Bot Management Commands
                     case "status":
-                        if (await BybitController.Instance.StatusAsync())
+                        if (await Trader.Instance.APIController.StatusAsync())
                             Console.WriteLine("Bot is running smoothly.");
                         else
                             Console.WriteLine("Bot encountered issues.");
+                        break;
+                    case "db status":
+                        Console.WriteLine("Checking database status...");
+                        // Implement database status check if needed
+                        Trader.Instance.DBController.TestConnection();
                         break;
                     case "restart":
                         Console.WriteLine("Restarting the bot...");
                         break;
                     //Order Management Commands
                     case "place order":
+                        try
+                        {
+                            var order = await Trader.Instance.APIController.PlaceOrderAsync("XAUTUSDT", Model.OrderSide.Buy, Model.OrderType.Market, 0.001m);
+                            Console.WriteLine($"Order placed: ID: {order.OrderId}, Symbol: {order.Symbol}, Quantity: {order.Quantity}, Price: {order.Price}, Status: {order.Status}, Type: {order.Type}, Side: {order.Side}, Created At: {order.CreatedAt}");
+                            Trader.Instance.DBController.InsertOrder(order);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Error placing order: " + ex.Message);
+                        }
                         Console.WriteLine("Placing a new order...");
-                        await OrderManager.Instance.PlaceOrderAsync();
                         break;
                     case "cancel order":
-                        Console.WriteLine("Cancelling the order...");
+                    try
+                        {
+                            Console.WriteLine("Cancelling the order...");
+                            var orders = Trader.Instance.DBController.GetOrders();
+                            var order = orders.LastOrDefault();
+                            if (order != null)
+                            {
+                                await Trader.Instance.APIController.CloseOrderAsync(order);
+                                Console.WriteLine($"Order {order.OrderId} cancelled.");
+                            }
+                            else
+                            {
+                                Console.WriteLine("No orders found to cancel.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Error cancelling order: " + ex.Message);
+                        }
                         break;
                     case "view orders":
                         Console.WriteLine("Displaying all orders...");
@@ -113,28 +147,46 @@ namespace BeyondBot.View
                         
                         break;
                     case "show saved orders":
-                        Console.WriteLine("Fetching orders from database...");
-                        Console.WriteLine("Do you want to filter by symbol? (yes/no)");
-                        input = Console.ReadLine() ?? "";
+                    try
+                        {
+                            Console.WriteLine("Do you want to filter by symbol? (yes/no)");
+                            input = Console.ReadLine() ?? "";
 
-                        if (input.ToLower() == "yes")
-                        {
-                            Console.Write("Enter symbol: ");
-                            string symbol = Console.ReadLine() ?? "";
-                            var ordersBySymbol = .Instance.GetOrders(symbol);
-                            foreach (var order in ordersBySymbol)
+                            if (input.ToLower() == "yes")
                             {
-                                Console.WriteLine($"ID: {order.OrderId}, Symbol: {order.Symbol}, Quantity: {order.Quantity}, Price: {order.Price}, Status: {order.Status}, Type: {order.Type}, Side: {order.Side}, Created At: {order.CreatedAt}");
+                                Console.Write("Enter symbol: ");
+                                string symbol = Console.ReadLine() ?? "";
+                                var ordersBySymbol = Trader.Instance.DBController.GetOrders(symbol);
+                                foreach (var order in ordersBySymbol)
+                                {
+                                    Console.WriteLine($"ID: {order.OrderId}, Symbol: {order.Symbol}, Quantity: {order.Quantity}, Price: {order.Price}, Status: {order.Status}, Type: {order.Type}, Side: {order.Side}, Created At: {order.CreatedAt}");
+                                }
+                            }
+                            else
+                            {
+                                var allOrders = Trader.Instance.DBController.GetOrders();
+                                foreach (var order in allOrders)
+                                {
+                                    Console.WriteLine($"ID: {order.OrderId}, Symbol: {order.Symbol}, Quantity: {order.Quantity}, Price: {order.Price}, Status: {order.Status}, Type: {order.Type}, Side: {order.Side}, Created At: {order.CreatedAt}");
+                                }
                             }
                         }
-                        else
+                        catch (Exception ex)
                         {
-                            var allOrders = ModelManager.Instance.Get;
-                            foreach (var order in allOrders)
-                            {
-                                Console.WriteLine($"ID: {order.OrderId}, Symbol: {order.Symbol}, Quantity: {order.Quantity}, Price: {order.Price}, Status: {order.Status}, Type: {order.Type}, Side: {order.Side}, Created At: {order.CreatedAt}");
-                            }
+                            Console.WriteLine("Error fetching saved orders: " + ex.Message);
                         }
+                        break;
+                    case "delete all saved orders":
+                        try
+                        {
+                            Trader.Instance.DBController.DeleteOrder();
+                            Console.WriteLine("All saved orders have been deleted from the database.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Error deleting saved orders: " + ex.Message);
+                        }
+                        break;
                     #endregion
 
                     default:

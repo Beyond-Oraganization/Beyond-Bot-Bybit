@@ -3,7 +3,6 @@ using Bybit.Net.Clients;
 using Bybit.Net.Objects.Models.V5;
 using Bybit.Net.Enums;
 using CryptoExchange.Net.Authentication;
-using System.Runtime.CompilerServices;
 
 //ByBit: YT1Of1CddArC6yKFUk
 //ByBit-secret: DWKdiH6X7Kog6lSVmfrEnbRNG0kunGXUYoZs
@@ -25,9 +24,57 @@ namespace BeyondBot.Controller
 
         public Order ConvertToOrder(BybitOrder bybitOrder)
         {
-            Model.OrderStatus status = (Model.OrderStatus)Enum.Parse(typeof(Model.OrderStatus), bybitOrder.Status.ToString());
-            Model.OrderType type = (Model.OrderType)Enum.Parse(typeof(Model.OrderType), bybitOrder.OrderType.ToString());
-            Model.OrderSide side = (Model.OrderSide)Enum.Parse(typeof(Model.OrderSide), bybitOrder.Side.ToString());
+            Model.OrderStatus status; 
+            switch (bybitOrder.Status)
+            {
+                case Bybit.Net.Enums.OrderStatus.New:
+                    status = Model.OrderStatus.New;
+                    break;
+                case Bybit.Net.Enums.OrderStatus.PartiallyFilled:
+                    status = Model.OrderStatus.PartiallyFilled;
+                    break;
+                case Bybit.Net.Enums.OrderStatus.Filled:
+                    status = Model.OrderStatus.Filled;
+                    break;
+                case Bybit.Net.Enums.OrderStatus.Cancelled:
+                    status = Model.OrderStatus.Canceled;
+                    break;
+                case Bybit.Net.Enums.OrderStatus.Rejected:
+                    status = Model.OrderStatus.Rejected;
+                    break;
+                default:
+                    status = Model.OrderStatus.None;
+                    break;
+            }
+            
+            Model.OrderType type;
+            switch (bybitOrder.OrderType)
+            {
+                case Bybit.Net.Enums.OrderType.Market:
+                    type = Model.OrderType.Market;
+                    break;
+                case Bybit.Net.Enums.OrderType.Limit:
+                    type = Model.OrderType.Limit;
+                    break;
+                default:
+                    type = Model.OrderType.None;
+                    break;
+            }
+
+            Model.OrderSide side;
+            switch (bybitOrder.Side)
+            {
+                case Bybit.Net.Enums.OrderSide.Buy:
+                    side = Model.OrderSide.Buy;
+                    break;
+                case Bybit.Net.Enums.OrderSide.Sell:
+                    side = Model.OrderSide.Sell;
+                    break;
+                default:
+                    side = Model.OrderSide.None;
+                    break;
+            }
+
             return new Order(bybitOrder.OrderId, bybitOrder.Symbol, bybitOrder.Quantity, bybitOrder.Price ?? 0, status, type, side, bybitOrder.CreateTime);
         }
 
@@ -46,14 +93,23 @@ namespace BeyondBot.Controller
             return ConvertToOrder(bybitOrder);
         }
 
-        public async Task<Order> CancelOrderAsync(string orderId)
+        public async Task<Order> CloseOrderAsync(Order order)
         {
             // Placeholder: assume symbol is known or hardcoded; in real scenario, store or retrieve symbol
             string symbol = "XAUTUSDT"; // TODO: Get actual symbol
-            var result = await client.V5Api.Trading.CancelOrderAsync(Category.Linear, symbol, orderId: orderId);
-            if (!result.Success) throw new Exception("Failed to cancel order: " + result.Error?.Message);
+            string orderId = order.OrderId;
+            if(order.Side == Model.OrderSide.Buy)
+            {
+                var result = await client.V5Api.Trading.PlaceOrderAsync(Category.Linear, order.Symbol, Bybit.Net.Enums.OrderSide.Sell, NewOrderType.Market, order.Quantity);
+                if (!result.Success) throw new Exception("Failed to cancel order: " + result.Error?.Message);
+            }
+            else
+            {
+                var result = await client.V5Api.Trading.PlaceOrderAsync(Category.Linear, order.Symbol, Bybit.Net.Enums.OrderSide.Buy, NewOrderType.Market, order.Quantity);
+                if (!result.Success) throw new Exception("Failed to cancel order: " + result.Error?.Message);
+            }
 
-            var orderResult = await client.V5Api.Trading.GetOrdersAsync(Category.Linear, symbol: symbol, orderId: result.Data.OrderId);
+            var orderResult = await client.V5Api.Trading.GetOrdersAsync(Category.Linear, symbol: symbol, orderId: orderId);
             if (!orderResult.Success || orderResult.Data.List.Count() == 0) throw new Exception("Failed to get order");
 
             var bybitOrder = orderResult.Data.List[0];

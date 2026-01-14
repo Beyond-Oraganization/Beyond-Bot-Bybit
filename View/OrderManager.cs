@@ -5,7 +5,6 @@ namespace BeyondBot.View
 {
     class OrderManager
     {
-        IAPIController bybitController = BybitController.Instance;
         private static OrderManager? instance;
         public static OrderManager Instance => instance ??= new OrderManager();
 
@@ -28,7 +27,7 @@ namespace BeyondBot.View
         {
             try
             {
-                var orders = await bybitController.GetOrdersAsync();
+                var orders = await Trader.Instance.APIController.GetOrdersAsync();
 
                 if(orders.Count == 0)
                 {
@@ -50,9 +49,8 @@ namespace BeyondBot.View
             {
                 // Implementation for placing an order
                 Console.WriteLine("Placing a new order...");
-                IAPIController bybitController = BybitController.Instance;
                 // Example parameters; in real scenario, gather from user input
-                var order = await bybitController.PlaceOrderAsync("XAUTUSDT", Model.OrderSide.Buy, Model.OrderType.Market, 0.001m);
+                var order = await Trader.Instance.APIController.PlaceOrderAsync("XAUTUSDT", Model.OrderSide.Buy, Model.OrderType.Market, 0.001m);
                 DisplayOrders(order);
                 ModelManager.Instance.SaveOrder(order);
             }

@@ -3,6 +3,7 @@ namespace BeyondBot.Model.Indicator
 {
     class ATR : MovingAvarage
     {
+        public string Description => "Average True Range";
         public ATR() : base()
         {
         }
@@ -40,6 +41,18 @@ namespace BeyondBot.Model.Indicator
             }
 
             return atrs;
+        }
+
+        public override MovingAvarage Parse(string data)
+        {
+            var parts = data.Split(';');
+            return new ATR(
+                int.Parse(parts[0]),
+                parts[1],
+                int.Parse(parts[2]),
+                decimal.Parse(parts[3]),
+                DateTime.Parse(parts[4])
+            );
         }
     }
 }

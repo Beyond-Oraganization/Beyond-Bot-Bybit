@@ -27,11 +27,23 @@ namespace BeyondBot.Model.Indicator
                     Name = "RMA",
                     Depth = depth,
                     DateTime = kline.OpenTime,
-                    Value = kline.HighPrice - kline.LowPrice
+                    Value = (kline.HighPrice - kline.LowPrice) * weighting + rmas[rmas.Count - 1].Value * (1 - weighting)
                 });
             }
 
             return rmas;
+        }
+
+        public override MovingAvarage Parse(string data)
+        {
+            var parts = data.Split(';');
+            return new RMA(
+                int.Parse(parts[0]),
+                parts[1],
+                int.Parse(parts[2]),
+                decimal.Parse(parts[3]),
+                DateTime.Parse(parts[4])
+            );
         }
     }
 }

@@ -7,6 +7,7 @@ namespace BeyondBot.Controller
 {
     interface IDBController
     {
+        bool TestConnection();
         List<Symbol> GetSymbols();
         List<Symbol> GetSymbols(string symbolName);
         void InsertSymbol(string symbolName);
@@ -32,11 +33,12 @@ namespace BeyondBot.Controller
         List<Order> GetOrders(string symbol);
         void InsertOrder(Order order);
         void UpdateOrder(string orderID, Order order);
+        void DeleteOrder();
         void DeleteOrder(string orderID);
 
-        List<StrategyCache> GetStrategies();
-        void InsertStrategy(StrategyCache strategy);
-        void UpdateStrategy(int strategyID, StrategyCache strategy);
+        List<IndicatorCache> GetStrategies();
+        void InsertStrategy(IndicatorCache strategy);
+        void UpdateStrategy(int strategyID, IndicatorCache strategy);
         void DeleteStrategy(int strategyID);
     }
 }

@@ -1,7 +1,7 @@
--- Migration script to rename Strategies table to StrategyCaches
+-- Migration script to rename StrategyCaches table to IndicatorCaches
 -- Run this on your existing database to update the table name
 
 USE BeyondBotDB;
 
 -- Rename the table
-RENAME TABLE Strategies TO StrategyCaches;
+RENAME TABLE StrategyCaches TO IndicatorCaches;

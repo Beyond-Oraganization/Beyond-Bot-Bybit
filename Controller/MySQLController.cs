@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using BeyondBot.Model;
+using Bybit.Net.Enums;
+using System.IO;
 
 namespace BeyondBot.Controller
 {
@@ -12,14 +14,92 @@ namespace BeyondBot.Controller
     /// </summary>
     public class MySQLController : IDBController
     {
+        
         /// <summary>
         /// Connection string for the MySQL database.
         /// Update this with your actual database credentials and server details.
         /// </summary>
-        private readonly string connectionString = "server=localhost;database=BeyondBotDB;uid=root;pwd=;";
+        private readonly string connectionString = "server=localhost;database=BeyondBotDB;uid=root;pwd=Alderum_31012007;";
+        private readonly string baseConnectionString = "server=localhost;uid=root;pwd=Alderum_31012007;";
 
         public static MySQLController? instance;
-        public static MySQLController Instance => instance ??= new MySQLController();
+        public static MySQLController Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new MySQLController();
+                    instance.InitializeDatabase();
+                }
+                return instance;
+            }
+        }
+
+        private void InitializeDatabase()
+        {
+            try
+            {
+                // Try to connect to the database
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    // If successful, database exists
+                    return;
+                }
+            }
+            catch (MySqlException)
+            {
+                // Database does not exist, create it
+                using (var conn = new MySqlConnection(baseConnectionString))
+                {
+                    conn.Open();
+                    var cmd = new MySqlCommand("CREATE DATABASE IF NOT EXISTS BeyondBotDB;", conn);
+                    cmd.ExecuteNonQuery();
+                }
+
+                // Now execute the schema
+                string schemaPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "Model", "DatabaseSchema.sql");
+                if (File.Exists(schemaPath))
+                {
+                    string schemaSql = File.ReadAllText(schemaPath);
+                    using (var conn = new MySqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        var commands = schemaSql.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var command in commands)
+                        {
+                            if (!string.IsNullOrWhiteSpace(command))
+                            {
+                                var cmd = new MySqlCommand(command.Trim(), conn);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    throw new FileNotFoundException("DatabaseSchema.sql not found", schemaPath);
+                }
+            }
+        }
+
+        public bool TestConnection()
+        {
+            try
+            {
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                    return conn.State == System.Data.ConnectionState.Open;
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Error connecting to database: " + ex.Message);
+                return false;
+            }
+        }
 
         // Symbol CRUD Operations
 
@@ -441,14 +521,20 @@ namespace BeyondBot.Controller
                 {
                     while (reader.Read())
                     {
+                        BeyondBot.Model.OrderStatus status = BeyondBot.Model.OrderStatus.New;
+                        BeyondBot.Model.OrderType type = BeyondBot.Model.OrderType.Limit;
+                        BeyondBot.Model.OrderSide side = BeyondBot.Model.OrderSide.Buy;
+                        Enum.TryParse(reader.GetString("Status"), true, out status);
+                        Enum.TryParse(reader.GetString("Type"), true, out type);
+                        Enum.TryParse(reader.GetString("Side"), true, out side);
                         var order = new Order(
                             reader.GetString("OrderId"),
                             reader.GetString("Symbol"),
                             reader.GetDecimal("Quantity"),
                             reader.GetDecimal("Price"),
-                            Enum.Parse<OrderStatus>(reader.GetString("Status")),
-                            Enum.Parse<OrderType>(reader.GetString("Type")),
-                            Enum.Parse<OrderSide>(reader.GetString("Side")),
+                            status,
+                            type,
+                            side,
                             reader.GetDateTime("CreatedAt")
                         );
                         list.Add(order);
@@ -470,14 +556,20 @@ namespace BeyondBot.Controller
                 {
                     while (reader.Read())
                     {
+                        BeyondBot.Model.OrderStatus status = BeyondBot.Model.OrderStatus.New;
+                        BeyondBot.Model.OrderType type = BeyondBot.Model.OrderType.Limit;
+                        BeyondBot.Model.OrderSide side = BeyondBot.Model.OrderSide.Buy;
+                        Enum.TryParse(reader.GetString("Status"), true, out status);
+                        Enum.TryParse(reader.GetString("Type"), true, out type);
+                        Enum.TryParse(reader.GetString("Side"), true, out side);
                         var order = new Order(
                             reader.GetString("OrderId"),
                             reader.GetString("Symbol"),
                             reader.GetDecimal("Quantity"),
                             reader.GetDecimal("Price"),
-                            Enum.Parse<OrderStatus>(reader.GetString("Status")),
-                            Enum.Parse<OrderType>(reader.GetString("Type")),
-                            Enum.Parse<OrderSide>(reader.GetString("Side")),
+                            status,
+                            type,
+                            side,
                             reader.GetDateTime("CreatedAt")
                         );
                         list.Add(order);
@@ -536,6 +628,16 @@ namespace BeyondBot.Controller
         /// Deletes an Order from the database by its OrderId.
         /// </summary>
         /// <param name="orderId">The OrderId of the Order to delete.</param>
+        /// public void DeleteOrder(string orderId)
+        public void DeleteOrder()
+        {
+            using (var conn = new MySqlConnection(connectionString))
+            {
+                conn.Open();
+                var cmd = new MySqlCommand("DELETE FROM Orders", conn);
+                cmd.ExecuteNonQuery();
+            }
+        }
         public void DeleteOrder(string orderId)
         {
             using (var conn = new MySqlConnection(connectionString))
@@ -553,19 +655,19 @@ namespace BeyondBot.Controller
         /// Retrieves all Strategies from the database.
         /// Note: This method fetches all records; consider adding filters for large datasets.
         /// </summary>
-        /// <returns>A list of all StrategyCache objects.</returns>
-        public List<StrategyCache> GetStrategies()
+        /// <returns>A list of all IndicatorCache objects.</returns>
+        public List<IndicatorCache> GetStrategies()
         {
-            var list = new List<StrategyCache>();
+            var list = new List<IndicatorCache>();
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("SELECT ID, KLineID, StrategyData FROM StrategyCaches", conn);
+                var cmd = new MySqlCommand("SELECT ID, KLineID, StrategyData FROM IndicatorCaches", conn);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        var strategy = new StrategyCache(
+                        var strategy = new IndicatorCache(
                             reader.GetInt32("ID"),
                             reader.GetInt32("KLineID"),
                             reader.GetString("StrategyData")
@@ -580,13 +682,13 @@ namespace BeyondBot.Controller
         /// <summary>
         /// Inserts a new Strategy into the database.
         /// </summary>
-        /// <param name="strategy">The StrategyCache object to insert (ID will be auto-generated).</param>
-        public void InsertStrategy(StrategyCache strategy)
+        /// <param name="strategy">The IndicatorCache object to insert (ID will be auto-generated).</param>
+        public void InsertStrategy(IndicatorCache strategy)
         {
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("INSERT INTO StrategyCaches (KLineID, StrategyData) VALUES (@kid, @sd)", conn);
+                var cmd = new MySqlCommand("INSERT INTO IndicatorCaches (KLineID, StrategyData) VALUES (@kid, @sd)", conn);
                 cmd.Parameters.AddWithValue("@kid", strategy.KLineID);
                 cmd.Parameters.AddWithValue("@sd", strategy.StrategyData);
                 cmd.ExecuteNonQuery();
@@ -597,13 +699,13 @@ namespace BeyondBot.Controller
         /// Updates an existing Strategy in the database.
         /// </summary>
         /// <param name="id">The ID of the Strategy to update.</param>
-        /// <param name="strategy">The updated StrategyCache object.</param>
-        public void UpdateStrategy(int id, StrategyCache strategy)
+        /// <param name="strategy">The updated IndicatorCache object.</param>
+        public void UpdateStrategy(int id, IndicatorCache strategy)
         {
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("UPDATE StrategyCaches SET KLineID=@kid, StrategyData=@sd WHERE ID=@id", conn);
+                var cmd = new MySqlCommand("UPDATE IndicatorCaches SET KLineID=@kid, StrategyData=@sd WHERE ID=@id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 cmd.Parameters.AddWithValue("@kid", strategy.KLineID);
                 cmd.Parameters.AddWithValue("@sd", strategy.StrategyData);
@@ -620,7 +722,7 @@ namespace BeyondBot.Controller
             using (var conn = new MySqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new MySqlCommand("DELETE FROM StrategyCaches WHERE ID=@id", conn);
+                var cmd = new MySqlCommand("DELETE FROM IndicatorCaches WHERE ID=@id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 cmd.ExecuteNonQuery();
             }

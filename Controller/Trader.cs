@@ -4,7 +4,7 @@ namespace BeyondBot.Controller
 {
     class Trader
     {
-        public static Trader? instance;
+        static Trader? instance;
         public static Trader Instance => instance ??= new Trader();
         IDBController dbController = MySQLController.Instance;
         IAPIController apiController = BybitController.Instance;

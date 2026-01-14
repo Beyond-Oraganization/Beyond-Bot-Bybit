@@ -138,3 +138,24 @@ After changes, build the project and test CRUD operations.
 Verify data integrity and relationships.
 Check for any breaking changes in existing code.
 This approach ensures your database and code remain synchronized as your project evolves. If you need help with specific modifications, provide details about the changes you want to make.
+
+To rename the database table manually (from Strategies to StrategyCaches), follow these steps. This assumes you have access to your MySQL database (e.g., via MySQL Workbench, command line, or another client) and that the table exists in the BeyondBotDB database.
+
+Manual Steps:
+Connect to your MySQL database: Use your preferred MySQL client tool (e.g., MySQL Command Line Client, MySQL Workbench, or phpMyAdmin).
+
+Select the database: Run the following SQL command to switch to the target database:
+
+Rename the table: Execute the RENAME TABLE command to update the table name:
+
+This command is idempotent (safe to run multiple times if the table already exists with the new name).
+It preserves all data, indexes, and foreign key constraints.
+Verify the change: After running the command, confirm the table was renamed by listing tables or querying the new table name:
+
+Or check the structure:
+
+How I Created the Migration Script:
+I reviewed the original database schema in DatabaseSchema.sql, which defines the table as StrategyCaches.
+Based on the code changes (renaming the class and updating references), I identified that existing databases might still have the old Strategies table name.
+I generated a simple SQL script to perform the rename, ensuring it matches the new schema. This script is stored in Migration_Rename_Strategies.sql for easy execution.
+If you encounter errors (e.g., table not found), ensure the database and table exist, and check your permissions. For production databases, back up data first. If you need to automate this in code, you could add it to your application's startup logic using the MySQL connector.

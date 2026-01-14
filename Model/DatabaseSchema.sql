@@ -29,7 +29,7 @@ CREATE TABLE KLines (
     FOREIGN KEY (TimeframeID) REFERENCES Timeframes(ID) ON DELETE CASCADE
 );
 
-CREATE TABLE StrategyCaches (
+CREATE TABLE IndicatorCaches (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     KLineID INT NOT NULL,
     StrategyData TEXT,
